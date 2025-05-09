@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.example.inventory_management_2025.models.enums.ProductCategory;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Setter
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,5 +30,8 @@ public class Product {
     private ProductCategory category;
 
     private String imageUrl;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
 }

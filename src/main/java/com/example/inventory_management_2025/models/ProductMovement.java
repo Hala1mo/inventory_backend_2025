@@ -46,6 +46,8 @@ public class ProductMovement {
     @Column(nullable = false)
     private ShipmentStatus shipmentStatus = ShipmentStatus.PENDING;
 
+    private String notes;
+
 
 }
 

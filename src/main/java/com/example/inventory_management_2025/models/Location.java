@@ -3,6 +3,8 @@ package com.example.inventory_management_2025.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Setter
 @Getter
@@ -29,4 +31,6 @@ public class Location {
     @Column(nullable = false)
     private double latitude;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

@@ -14,13 +14,13 @@ public class ProductMovementMapper {
         ProductMovementResponseDTO dto = new ProductMovementResponseDTO();
         dto.setId(movement.getId());
         dto.setMovementType(movement.getMovementType());
-        dto.setProductName(movement.getProduct() != null ? movement.getProduct().getName() : null);
-        dto.setFromLocationName(movement.getFromLocation() != null ? movement.getFromLocation().getName() : null);
-        dto.setToLocationName(movement.getToLocation() != null ? movement.getToLocation().getName() : null);
+        dto.setProduct(movement.getProduct());
+        dto.setFromLocation(movement.getFromLocation());
+        dto.setToLocation(movement.getToLocation());
         dto.setShipmentStatus(movement.getShipmentStatus());
         dto.setQuantity(movement.getQuantity());
         dto.setNotes(movement.getNotes());
-        dto.setTimestamp(movement.getTimestamp());
+        dto.setCreatedAt(movement.getCreatedAt());
         return dto;
     }
 
@@ -36,7 +36,7 @@ public class ProductMovementMapper {
         movement.setShipmentStatus(dto.getShipmentStatus());
         movement.setQuantity(dto.getQuantity());
         movement.setNotes(dto.getNotes());
-        movement.setTimestamp(LocalDateTime.now());
+        movement.setCreatedAt(LocalDateTime.now());
         return movement;
     }
 }

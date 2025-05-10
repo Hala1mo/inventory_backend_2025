@@ -14,21 +14,26 @@ public class ProductMapper {
         ProductResponseDTO productDTO = new ProductResponseDTO();
         productDTO.setId(product.getId());
         productDTO.setName(product.getName());
+        productDTO.setCode(product.getCode());
         productDTO.setCategory(product.getCategory());
         productDTO.setDescription(product.getDescription());
         productDTO.setPrice(product.getPrice());
         productDTO.setImageUrl(product.getImageUrl());
+        productDTO.setStatus(product.getStatus());
+        productDTO.setCreatedAt(product.getCreatedAt());
         return productDTO;
     }
 
     public static Product mapToEntity(ProductRequestDTO productRequestDTO) {
         Product product = new Product();
         product.setName(productRequestDTO.getName());
+        product.setCode(productRequestDTO.getCode());
         product.setCategory(productRequestDTO.getCategory());
         product.setDescription(productRequestDTO.getDescription());
         product.setPrice(productRequestDTO.getPrice());
         product.setImageUrl(productRequestDTO.getImageUrl());
         product.setCreatedAt(LocalDateTime.now());
+        product.setStatus(productRequestDTO.getStatus());
         return product;
     }
 }

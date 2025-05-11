@@ -12,6 +12,5 @@ public class LocationRequestDTO {
     private String name;
     private String country;
     private String city;
-    private Double longitude;
-    private Double latitude;
+    private String address;
 }

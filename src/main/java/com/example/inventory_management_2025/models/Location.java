@@ -25,12 +25,10 @@ public class Location {
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
-    private double longitude;
-
-    @Column(nullable = false)
-    private double latitude;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private String address;
+
 }

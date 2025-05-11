@@ -20,9 +20,6 @@ public class ProductMovement {
     private Long id;
 
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id")
     private Product product;
@@ -47,6 +44,9 @@ public class ProductMovement {
     private ShipmentStatus shipmentStatus = ShipmentStatus.PENDING;
 
     private String notes;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
 
 

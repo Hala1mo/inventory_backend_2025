@@ -13,8 +13,8 @@ public class LocationMapper {
         locationDTO.setName(location.getName());
         locationDTO.setCity(location.getCity());
         locationDTO.setCountry(location.getCountry());
-        locationDTO.setLatitude(location.getLatitude());
-        locationDTO.setLongitude(location.getLongitude());
+        locationDTO.setAddress(location.getAddress());
+        locationDTO.setCreatedAt(location.getCreatedAt());
         return locationDTO;
     }
 
@@ -23,8 +23,7 @@ public class LocationMapper {
         location.setName(locationRequestDTO.getName());
         location.setCity(locationRequestDTO.getCity());
         location.setCountry(locationRequestDTO.getCountry());
-        location.setLatitude(locationRequestDTO.getLatitude());
-        location.setLongitude(locationRequestDTO.getLongitude());
+        location.setAddress(locationRequestDTO.getAddress());
         location.setCreatedAt(LocalDateTime.now());
         return location;
     }

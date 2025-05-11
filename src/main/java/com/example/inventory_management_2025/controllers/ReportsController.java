@@ -26,4 +26,5 @@ public class ReportsController {
     public List<ProductBalanceReportDTO> getSpecificProductBalances(@PathVariable Long productId) {
         return reportsService.getSpecificProductBalances(productId);
     }
+
 }

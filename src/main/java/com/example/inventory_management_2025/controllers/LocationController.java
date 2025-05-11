@@ -87,4 +87,10 @@ public class LocationController {
     public ResponseEntity<LocationResponseDTO> getLocationByID(@PathVariable Long id) {
         return ResponseEntity.ok(locationService.getLocationById(id));
     }
+
+
+    @GetMapping("/{locationId}/inventory")
+    public List<ProductStockDTO> getInventoryByLocation(@PathVariable Long locationId) {
+        return locationService.getProductsInLocation(locationId);
+    }
 }

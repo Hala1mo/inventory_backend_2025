@@ -2,6 +2,8 @@ package com.example.inventory_management_2025.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -12,6 +14,6 @@ public class LocationResponseDTO {
     private String name;
     private String country;
     private String city;
-    private Double longitude;
-    private Double latitude;
+    private String address;
+    private LocalDateTime createdAt;
 }

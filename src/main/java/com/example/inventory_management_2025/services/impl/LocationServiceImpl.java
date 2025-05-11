@@ -2,15 +2,13 @@ package com.example.inventory_management_2025.services.impl;
 
 import com.example.inventory_management_2025.dto.LocationRequestDTO;
 import com.example.inventory_management_2025.dto.LocationResponseDTO;
+import com.example.inventory_management_2025.dto.ProductStockDTO;
 import com.example.inventory_management_2025.mapper.LocationMapper;
-import com.example.inventory_management_2025.mapper.ProductMapper;
 import com.example.inventory_management_2025.models.Location;
-import com.example.inventory_management_2025.models.Product;
 import com.example.inventory_management_2025.repo.LocationRepository;
 import com.example.inventory_management_2025.services.LocationService;
 
 import error.ResourceNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +23,7 @@ public class LocationServiceImpl implements LocationService {
     public LocationServiceImpl(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
+
     @Override
     public LocationResponseDTO createLocation(LocationRequestDTO locationDTO) {
         Location location = LocationMapper.mapToEntity(locationDTO);
@@ -52,15 +51,14 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public LocationResponseDTO updateLocation(long id, LocationRequestDTO locationDTO) {
-        Location existingProduct = locationRepository.findById(id)
+        Location existingLocation = locationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location with ID " + id + " not found"));
 
-        existingProduct.setName(locationDTO.getName());
-        existingProduct.setCountry(locationDTO.getCountry());
-        existingProduct.setCity(locationDTO.getCity());
-        existingProduct.setLatitude(locationDTO.getLatitude());
-        existingProduct.setLongitude(locationDTO.getLongitude());
-        Location updatedProduct = locationRepository.save(existingProduct);
+        existingLocation.setName(locationDTO.getName());
+        existingLocation.setCountry(locationDTO.getCountry());
+        existingLocation.setCity(locationDTO.getCity());
+        existingLocation.setCity(locationDTO.getCity());
+        Location updatedProduct = locationRepository.save(existingLocation);
 
         return LocationMapper.mapToDTO(updatedProduct);
     }
@@ -69,8 +67,20 @@ public class LocationServiceImpl implements LocationService {
     public void deleteLocationById(long id) {
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location with ID " + id + " not found"));
-        if(location!=null) {
+        if (location != null) {
             locationRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<ProductStockDTO> getProductsInLocation(long id) {
+        List<Object[]> raw = locationRepository.fetchProductsInLocation(id);
+        return raw.stream()
+                .map(r -> new ProductStockDTO(
+                        ((Number) r[0]).longValue(),
+                        (String) r[1],
+                        ((Number) r[2]).intValue()
+                ))
+                .toList();
     }
 }

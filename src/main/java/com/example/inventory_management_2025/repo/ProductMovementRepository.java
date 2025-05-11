@@ -68,4 +68,8 @@ public interface ProductMovementRepository extends JpaRepository<ProductMovement
             ORDER BY location_name, product_name;
                         """, nativeQuery = true)
     List<Object[]> fetchProductBalanceByProductId(@Param("productId") Long productId);
+
+
+
+
 }

@@ -26,6 +26,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         Product product = ProductMapper.mapToEntity(productRequestDTO);
+//        if (productRepository.existsById(product.getCode())) {
+//            throw new IllegalArgumentException("Product with code '" + product.getCode() + "' already exists.");
+//        }
+
         Product newProduct = productRepository.save(product);
         return ProductMapper.mapToDTO(newProduct);
     }

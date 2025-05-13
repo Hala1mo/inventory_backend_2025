@@ -3,9 +3,13 @@ package com.example.inventory_management_2025.services.impl;
 
 import com.example.inventory_management_2025.dto.ProductRequestDTO;
 import com.example.inventory_management_2025.dto.ProductResponseDTO;
+import com.example.inventory_management_2025.dto.reportsDTO.ProductBalanceReportDTO;
 import com.example.inventory_management_2025.models.Product;
+import com.example.inventory_management_2025.repo.ProductMovementRepository;
 import com.example.inventory_management_2025.repo.ProductRepository;
 import com.example.inventory_management_2025.services.ProductService;
+import error.CustomBadRequestException;
+import error.DeletionNotAllowedException;
 import error.ResourceNotFoundException;
 import com.example.inventory_management_2025.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +21,20 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
+    ProductMovementRepository productMovementRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,ProductMovementRepository productMovementRepository ) {
         this.productRepository = productRepository;
+        this.productMovementRepository = productMovementRepository;
     }
 
     @Override
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         Product product = ProductMapper.mapToEntity(productRequestDTO);
-//        if (productRepository.existsById(product.getCode())) {
-//            throw new IllegalArgumentException("Product with code '" + product.getCode() + "' already exists.");
-//        }
+        if (productRepository.existsByCode(productRequestDTO.getCode())) {
+            throw new CustomBadRequestException("Product with code '" + productRequestDTO.getCode() + "' already exists.");
+        }
 
         Product newProduct = productRepository.save(product);
         return ProductMapper.mapToDTO(newProduct);
@@ -75,8 +81,32 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
+
+
+        if (productMovementRepository.existsByProduct(product)) {
+            throw new DeletionNotAllowedException("This product has recorded inventory movements and cannot be deleted.");
+        }
+
         if (product != null) {
             productRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public List<ProductBalanceReportDTO> getSpecificProductBalances(long product_id) {
+        Product product = productRepository.findById(product_id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + product_id + " not found"));
+        List<Object[]> resultsForSpecific = productRepository.fetchProductBalanceByProductId(product_id);
+
+
+        return resultsForSpecific.stream()
+                .map(row -> new ProductBalanceReportDTO(
+                        ((Number) row[0]).longValue(),   // location_id
+                        (String) row[1],                 // location_name
+                        ((Number) row[2]).longValue(),   // product_id
+                        (String) row[3],                 // product_name
+                        ((Number) row[4]).intValue()     // balance
+                ))
+                .toList();
     }
 }

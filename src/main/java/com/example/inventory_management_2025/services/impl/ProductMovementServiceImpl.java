@@ -3,6 +3,7 @@ package com.example.inventory_management_2025.services.impl;
 import com.example.inventory_management_2025.dto.ProductMovementRequestDTO;
 import com.example.inventory_management_2025.dto.ProductMovementResponseDTO;
 import com.example.inventory_management_2025.dto.ProductResponseDTO;
+import com.example.inventory_management_2025.dto.ProductStockDTO;
 import com.example.inventory_management_2025.mapper.LocationMapper;
 import com.example.inventory_management_2025.mapper.ProductMapper;
 import com.example.inventory_management_2025.mapper.ProductMovementMapper;
@@ -13,7 +14,9 @@ import com.example.inventory_management_2025.repo.LocationRepository;
 import com.example.inventory_management_2025.repo.ProductMovementRepository;
 import com.example.inventory_management_2025.repo.ProductRepository;
 import com.example.inventory_management_2025.services.ProductMovementService;
+import error.CustomBadRequestException;
 import error.ResourceNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +28,9 @@ import java.util.List;
 public class ProductMovementServiceImpl implements ProductMovementService {
 
     ProductMovementRepository productMovementRepository;
-     ProductRepository productRepository;
-     LocationRepository locationRepository;
+
+    ProductRepository productRepository;
+    LocationRepository locationRepository;
 
     @Autowired
     public ProductMovementServiceImpl(
@@ -40,20 +44,41 @@ public class ProductMovementServiceImpl implements ProductMovementService {
 
     @Override
     public ProductMovementResponseDTO createProductMovement(ProductMovementRequestDTO productMovementDTO) {
-        Product product = productRepository.findById(productMovementDTO.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + productMovementDTO.getProductId() + " not found"));
+        Product product = productRepository.findByCode(productMovementDTO.getProduct().getCode());
+        if(product==null)
+                throw new ResourceNotFoundException("Product with Name " + productMovementDTO.getProduct().getName() + " not found");
 
+
+
+        //INCOMING
         Location fromLocation = null;
-        if (productMovementDTO.getFromLocationId() != null) {
-            fromLocation = locationRepository.findById(productMovementDTO.getFromLocationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("From Location with ID " + productMovementDTO.getFromLocationId() + " not found"));
+        if (productMovementDTO.getFromLocation()!= null) {
+            fromLocation = locationRepository.findByName(productMovementDTO.getFromLocation().getName());
+            if(fromLocation==null)
+                throw new ResourceNotFoundException("Source Location with Name " + productMovementDTO.getFromLocation().getName() + " not found");
+
+
+            ProductStockDTO currentStock = getSpecificProductsBalanceInLocation(fromLocation, product);
+            if (currentStock.getQuantity() < productMovementDTO.getQuantity()) {
+                throw new CustomBadRequestException("Not enough stock at source location");
+            }
+
+        }
+  ///OUTGOING
+        Location toLocation = null;
+        if (productMovementDTO.getToLocation() != null) {
+            toLocation = locationRepository.findByName(productMovementDTO.getToLocation().getName());
+            if(toLocation==null)
+                throw new ResourceNotFoundException("Destination Location with Name " + productMovementDTO.getToLocation().getName() + " not found");
         }
 
-        Location toLocation = null;
-        if (productMovementDTO.getToLocationId() != null) {
-            toLocation = locationRepository.findById(productMovementDTO.getToLocationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("To Location with ID " + productMovementDTO.getToLocationId() + " not found"));
+        if (productMovementDTO.getFromLocation() != null  && productMovementDTO.getToLocation()!= null  && productMovementDTO.getFromLocation().getName().equals(productMovementDTO.getToLocation().getName())) {
+            throw new CustomBadRequestException("Cannot move product within the same location");
         }
+        if (productMovementDTO.getQuantity() <= 0) {
+            throw new CustomBadRequestException("Quantity must be greater than zero");
+        }
+
 
         ProductMovement movement = ProductMovementMapper.mapToEntity(productMovementDTO, product, fromLocation, toLocation);
         ProductMovement savedMovement = productMovementRepository.save(movement);
@@ -81,36 +106,17 @@ public class ProductMovementServiceImpl implements ProductMovementService {
 
     @Override
     public ProductMovementResponseDTO updateProductMovement(long id, ProductMovementRequestDTO dto) {
-        // Check if movement exists
         ProductMovement existingMovement = productMovementRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product movement with ID " + id + " not found"));
 
-        // Get product and locations
-        Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + dto.getProductId() + " not found"));
-
-        Location fromLocation = null;
-        if (dto.getFromLocationId() != null) {
-            fromLocation = locationRepository.findById(dto.getFromLocationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("From Location with ID " + dto.getFromLocationId() + " not found"));
-        }
-
-        Location toLocation = null;
-        if (dto.getToLocationId() != null) {
-            toLocation = locationRepository.findById(dto.getToLocationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("To Location with ID " + dto.getToLocationId() + " not found"));
-        }
-
-        // Update fields
-        existingMovement.setProduct(product);
-        existingMovement.setFromLocation(fromLocation);
-        existingMovement.setToLocation(toLocation);
+        existingMovement.setProduct(existingMovement.getProduct());
+        existingMovement.setFromLocation(existingMovement.getFromLocation());
+        existingMovement.setToLocation(existingMovement.getToLocation());
         existingMovement.setMovementType(dto.getMovementType());
-        existingMovement.setShipmentStatus(dto.getShipmentStatus());
         existingMovement.setQuantity(dto.getQuantity());
         existingMovement.setNotes(dto.getNotes());
 
-        // Save and return
+
         ProductMovement updatedMovement = productMovementRepository.save(existingMovement);
         return ProductMovementMapper.mapToDTO(updatedMovement);
     }
@@ -120,9 +126,27 @@ public class ProductMovementServiceImpl implements ProductMovementService {
 
         ProductMovement location = productMovementRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location with ID " + id + " not found"));
-        if(location!=null) {
+        if (location != null) {
             productMovementRepository.deleteById(id);
         }
 
     }
+
+    @Override
+    public ProductStockDTO getSpecificProductsBalanceInLocation(Location location, Product product) {
+        Object result = productMovementRepository.fetchProductBalanceInLocation(location.getId(), product.getId());
+
+        if (result == null) {
+            throw new CustomBadRequestException("Product with Name " + product.getName() + " not found in location " + location.getName());
+        }
+
+        Object[] row = (Object[]) result;
+
+        return new ProductStockDTO(
+                ((Number) row[0]).longValue(),  // product_id
+                (String) row[1],                // product_name
+                ((Number) row[2]).intValue()    // quantity
+        );
+    }
+
 }

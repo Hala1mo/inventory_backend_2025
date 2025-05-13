@@ -1,7 +1,8 @@
 package com.example.inventory_management_2025.dto;
 
+import com.example.inventory_management_2025.models.Location;
+import com.example.inventory_management_2025.models.Product;
 import com.example.inventory_management_2025.models.enums.MovementType;
-import com.example.inventory_management_2025.models.enums.ShipmentStatus;
 import lombok.*;
 
 @Getter
@@ -10,11 +11,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductMovementRequestDTO {
-    private Long productId;
-    private Long fromLocationId;  // nullable
-    private Long toLocationId;    // nullable
+    private Product product;
+    private Location fromLocation;
+    private Location toLocation;
     private int quantity;
     private MovementType movementType;
-    private ShipmentStatus shipmentStatus;
     private String notes;
 }

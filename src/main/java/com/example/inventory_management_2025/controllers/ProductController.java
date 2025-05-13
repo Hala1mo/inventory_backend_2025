@@ -3,6 +3,7 @@ package com.example.inventory_management_2025.controllers;
 
 import com.example.inventory_management_2025.dto.ProductRequestDTO;
 import com.example.inventory_management_2025.dto.ProductResponseDTO;
+import com.example.inventory_management_2025.dto.reportsDTO.ProductBalanceReportDTO;
 import com.example.inventory_management_2025.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -83,5 +84,11 @@ public class ProductController {
     })
     public ResponseEntity<ProductResponseDTO> getProductByID(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+
+    @GetMapping("/product-balances/{productId}")
+    public List<ProductBalanceReportDTO> getSpecificProductBalances(@PathVariable Long productId) {
+        return productService.getSpecificProductBalances(productId);
     }
 }

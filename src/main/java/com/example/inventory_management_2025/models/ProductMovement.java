@@ -1,7 +1,6 @@
 package com.example.inventory_management_2025.models;
 
 import com.example.inventory_management_2025.models.enums.MovementType;
-import com.example.inventory_management_2025.models.enums.ShipmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,9 +38,6 @@ public class ProductMovement {
     @Column(nullable = false)
     private MovementType movementType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ShipmentStatus shipmentStatus = ShipmentStatus.PENDING;
 
     private String notes;
 

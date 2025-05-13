@@ -12,7 +12,9 @@ import java.util.List;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
+    Location findByName(String name);
 
+    boolean existsByName(String name);
 
     @Query(value = """
                 SELECT
@@ -28,5 +30,21 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
                 ORDER BY p.name;
             """, nativeQuery = true)
     List<Object[]> fetchProductsInLocation(@Param("locationId") Long locationId);
+
+
+    @Query(value = """
+                SELECT
+                    l.id AS location_id,
+                    l.name AS location_name,
+                    COUNT(DISTINCT p.id) AS number_of_products
+                FROM product_movement pm
+                JOIN product p ON p.id = pm.product_id
+                JOIN location l ON l.id = pm.to_location_id OR l.id = pm.from_location_id
+                GROUP BY l.id, l.name
+                HAVING SUM(CASE WHEN pm.to_location_id = l.id THEN pm.quantity ELSE 0 END) -
+                       SUM(CASE WHEN pm.from_location_id = l.id THEN pm.quantity ELSE 0 END) > 0
+            """, nativeQuery = true)
+    List<Object[]> fetchProductCountsInAllLocations();
+
 
 }

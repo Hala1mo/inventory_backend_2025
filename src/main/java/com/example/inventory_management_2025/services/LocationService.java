@@ -21,4 +21,6 @@ public interface LocationService {
     void deleteLocationById(long id);
 
     List<ProductStockDTO> getProductsInLocation(long id);
+
+
 }

@@ -6,9 +6,13 @@ import com.example.inventory_management_2025.dto.ProductStockDTO;
 import com.example.inventory_management_2025.mapper.LocationMapper;
 import com.example.inventory_management_2025.models.Location;
 import com.example.inventory_management_2025.repo.LocationRepository;
+import com.example.inventory_management_2025.repo.ProductMovementRepository;
 import com.example.inventory_management_2025.services.LocationService;
 
+import error.CustomBadRequestException;
+import error.DeletionNotAllowedException;
 import error.ResourceNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +22,19 @@ import java.util.List;
 @Service
 public class LocationServiceImpl implements LocationService {
     LocationRepository locationRepository;
-
+    ProductMovementRepository productMovementRepository;
     @Autowired
-    public LocationServiceImpl(LocationRepository locationRepository) {
+    public LocationServiceImpl(LocationRepository locationRepository, ProductMovementRepository productMovementRepository) {
         this.locationRepository = locationRepository;
+        this.productMovementRepository=productMovementRepository;
     }
 
     @Override
     public LocationResponseDTO createLocation(LocationRequestDTO locationDTO) {
         Location location = LocationMapper.mapToEntity(locationDTO);
+        if (locationRepository.existsByName(location.getName())) {
+            throw new CustomBadRequestException("Location with name '" + location.getName() + "' already exists.");
+        }
         Location newLocation = locationRepository.save(location);
         return LocationMapper.mapToDTO(newLocation);
     }
@@ -57,7 +65,7 @@ public class LocationServiceImpl implements LocationService {
         existingLocation.setName(locationDTO.getName());
         existingLocation.setCountry(locationDTO.getCountry());
         existingLocation.setCity(locationDTO.getCity());
-        existingLocation.setCity(locationDTO.getCity());
+        existingLocation.setAddress(locationDTO.getAddress());
         Location updatedProduct = locationRepository.save(existingLocation);
 
         return LocationMapper.mapToDTO(updatedProduct);
@@ -67,6 +75,10 @@ public class LocationServiceImpl implements LocationService {
     public void deleteLocationById(long id) {
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location with ID " + id + " not found"));
+
+        if (productMovementRepository.existsByToLocation(location) || productMovementRepository.existsByFromLocation(location)) {
+            throw new DeletionNotAllowedException("This location has recorded inventory movements and cannot be deleted.");
+        }
         if (location != null) {
             locationRepository.deleteById(id);
         }
@@ -74,8 +86,8 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<ProductStockDTO> getProductsInLocation(long id) {
-        List<Object[]> raw = locationRepository.fetchProductsInLocation(id);
-        return raw.stream()
+        List<Object[]> row = locationRepository.fetchProductsInLocation(id);
+        return row.stream()
                 .map(r -> new ProductStockDTO(
                         ((Number) r[0]).longValue(),
                         (String) r[1],
@@ -83,4 +95,6 @@ public class LocationServiceImpl implements LocationService {
                 ))
                 .toList();
     }
+
+
 }

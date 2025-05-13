@@ -2,6 +2,7 @@ package com.example.inventory_management_2025.services;
 
 import com.example.inventory_management_2025.dto.ProductRequestDTO;
 import com.example.inventory_management_2025.dto.ProductResponseDTO;
+import com.example.inventory_management_2025.dto.reportsDTO.ProductBalanceReportDTO;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface ProductService {
     ProductResponseDTO updateProduct(long id,ProductRequestDTO productDTO);
 
     void deleteProductById(long id);
+
+    List<ProductBalanceReportDTO> getSpecificProductBalances(long productID);
 }

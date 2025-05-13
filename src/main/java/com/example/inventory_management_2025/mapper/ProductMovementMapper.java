@@ -17,7 +17,6 @@ public class ProductMovementMapper {
         dto.setProduct(movement.getProduct());
         dto.setFromLocation(movement.getFromLocation());
         dto.setToLocation(movement.getToLocation());
-        dto.setShipmentStatus(movement.getShipmentStatus());
         dto.setQuantity(movement.getQuantity());
         dto.setNotes(movement.getNotes());
         dto.setCreatedAt(movement.getCreatedAt());
@@ -33,7 +32,6 @@ public class ProductMovementMapper {
         movement.setFromLocation(fromLocation);
         movement.setToLocation(toLocation);
         movement.setMovementType(dto.getMovementType());
-        movement.setShipmentStatus(dto.getShipmentStatus());
         movement.setQuantity(dto.getQuantity());
         movement.setNotes(dto.getNotes());
         movement.setCreatedAt(LocalDateTime.now());

@@ -54,42 +54,21 @@ The application follows a clean architecture pattern with:
 
 ## Entity Relationship Diagram
 
-```mermaid
-erDiagram
-    Location ||--o{ ProductMovement : "from/to"
-    Product ||--o{ ProductMovement : "has"
+┌──────────────┐         ┌──────────────────────┐         ┌──────────────┐
+│   Location   │         │   ProductMovement    │         │   Product    │
+│──────────────│         │──────────────────────│         │──────────────│
+│ PK: id       │◄────────┤ PK: id               ├────────►│ PK: id       │
+│ name         │         │ movementType         │         │ name         │
+│ country      │         │ quantity             │         │ code         │
+│ city         │         │ notes                │         │ category     │
+│ address      │         │ createdAt            │         │ price        │
+│ createdAt    │         │ FK: product_id       │         │ description  │
+└──────────────┘         │ FK: from_location_id │         │ imageUrl     │
+                         │ FK: to_location_id   │         │ status       │
+                         └──────────────────────┘         │ createdAt    │
+                                                         └──────────────┘
+                                                         
 
-    Location {
-        int id PK
-        string name
-        string country
-        string city
-        string address
-        datetime createdAt
-    }
-
-    ProductMovement {
-        int id PK
-        string movementType
-        int quantity
-        string notes
-        datetime createdAt
-        int product_id FK
-        int from_location_id FK
-        int to_location_id FK
-    }
-
-    Product {
-        int id PK
-        string name
-        string code
-        string category
-        decimal price
-        string description
-        string imageUrl
-        string status
-        datetime createdAt
-    }
 
 ### Key Features
 

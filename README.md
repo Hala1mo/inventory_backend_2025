@@ -54,10 +54,6 @@ The application follows a clean architecture pattern with:
 
 ## Entity Relationship Diagram
 
-## Entity Relationship Diagram
-
-## Entity Relationship Diagram
-
 ```mermaid
 erDiagram
     Location ||--o{ ProductMovement : "from/to"

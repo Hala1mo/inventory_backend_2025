@@ -56,6 +56,8 @@ The application follows a clean architecture pattern with:
 
 ## Entity Relationship Diagram
 
+## Entity Relationship Diagram
+
 ```mermaid
 erDiagram
     Location ||--o{ ProductMovement : "from/to"
@@ -67,7 +69,7 @@ erDiagram
         string country
         string city
         string address
-        date createdAt
+        datetime createdAt
     }
 
     ProductMovement {
@@ -75,7 +77,7 @@ erDiagram
         string movementType
         int quantity
         string notes
-        date createdAt
+        datetime createdAt
         int product_id FK
         int from_location_id FK
         int to_location_id FK
@@ -90,7 +92,7 @@ erDiagram
         string description
         string imageUrl
         string status
-        date createdAt
+        datetime createdAt
     }
 
 ### Key Features

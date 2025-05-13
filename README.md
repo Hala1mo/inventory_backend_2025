@@ -54,20 +54,22 @@ The application follows a clean architecture pattern with:
 
 ## Entity Relationship Diagram
 
-┌──────────────┐         ┌──────────────────────┐         ┌──────────────┐
-│   Location   │         │   ProductMovement    │         │   Product    │
-│──────────────│         │──────────────────────│         │──────────────│
-│ PK: id       │◄────────┤ PK: id               ├────────►│ PK: id       │
-│ name         │         │ movementType         │         │ name         │
-│ country      │         │ quantity             │         │ code         │
-│ city         │         │ notes                │         │ category     │
-│ address      │         │ createdAt            │         │ price        │
-│ createdAt    │         │ FK: product_id       │         │ description  │
-└──────────────┘         │ FK: from_location_id │         │ imageUrl     │
-                         │ FK: to_location_id   │         │ status       │
-                         └──────────────────────┘         │ createdAt    │
-                                                         └──────────────┘
-                                                         
+```
+┌──────────────┐     ┌─────────────────────┐     ┌──────────────┐
+│   Location   │     │  ProductMovement    │     │    Product   │
+│              │     │                     │     │              │
+│ PK: id       │◄────┤ PK: id              │────►│ PK: id       │
+│ name         │     │ movementType        │     │ name         │
+│ country      │     │ quantity            │     │ code         │
+│ city         │     │ notes               │     │ category     │
+│ address      │     │ createdAt           │     │ price        │
+│ createdAt    │     │ FK: product_id      │     │ description  │
+└──────────────┘     │ FK: from_location_id│     │ imageUrl     │
+                     │ FK: to_location_id  │     │ status       │
+                     └─────────────────────┘     │ createdAt    │
+                                                 └──────────────┘
+```
+                
 
 
 ### Key Features

@@ -214,7 +214,6 @@ Access the API documentation:
 ### Hala Abdel Halim
 
 <p>Developed for <strong>ERPMax Solutions</strong><br>
-<em>Full Stack Developer specializing in Spring Boot and Modern Web Technologies</em></p>
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png" width="100%" />
 </div>
